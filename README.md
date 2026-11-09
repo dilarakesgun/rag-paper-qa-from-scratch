@@ -13,7 +13,7 @@ reducing hallucination and letting you trace where the answer came from.
 
 Example (over two arXiv cs.AI papers):
 - **Q:** "How many benchmarks does Strategist beat the baseline on?"
-- **A:** "Strategist beats the baseline on 24 out of 30 benchmarks." okey (grounded, from the correct paper)
+- **A:** "Strategist beats the baseline on 24 out of 30 benchmarks." *(correct — matches the paper's abstract)*
 
 ## How it works
 
@@ -49,7 +49,27 @@ not a statistically robust number.)*
 
 Hit@k measures retrieval quality, not answer faithfulness — answers should
 still be verified against the source, especially with a small LLM.
+## API & Deployment (FastAPI + Docker)
 
+The RAG pipeline is wrapped as a REST API with **FastAPI** and containerized with **Docker**.
+
+### Endpoints
+- `GET /health` — health check
+- `POST /ask` — send a question, get a grounded answer with its source passages
+  - Request: `{ "text": "your question" }`
+  - Response: `{ "answer": ..., "sources": [...] }`
+
+### Run with Docker
+​```bash
+docker build -t rag-api .
+docker run -p 8000:8000 rag-api
+​```
+Open http://127.0.0.1:8000/docs for the interactive Swagger UI.
+
+> Note: `api.py` ships with a lightweight **mock mode** so the service runs instantly without downloading models. The full RAG pipeline (`/ask` calling the real retriever + generator) is shown below.
+
+### Example `/ask` output (real RAG)
+![ask demo](ask_demo.png)
 ## How to run
 
 1. Open the notebook in Google Colab.
@@ -61,5 +81,7 @@ still be verified against the source, especially with a small LLM.
 - Uses a small local LLM (Qwen2.5-0.5B/1.5B); answers can be terse or slightly
   embellished — a larger model improves generation quality.
 - The evaluation set is small; expanding it would give a more reliable score.
-- No service deployment yet — **planned next step: serve the pipeline as a
-  REST API with FastAPI + Docker.**
+- In-memory FAISS index — **next step: move to a persistent vector database
+  (e.g., Chroma / pgvector).**
+- By default the Docker image runs in mock mode; wiring the full RAG into the
+  container is the natural follow-up.
