@@ -13,7 +13,7 @@ reducing hallucination and letting you trace where the answer came from.
 
 Example (over two arXiv cs.AI papers):
 - **Q:** "How many benchmarks does Strategist beat the baseline on?"
-- **A:** "Strategist beats the baseline on 24 out of 30 benchmarks." ✅ (grounded, from the correct paper)
+- **A:** "Strategist beats the baseline on 24 out of 30 benchmarks." okey (grounded, from the correct paper)
 
 ## How it works
 
